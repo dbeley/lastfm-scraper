@@ -41,7 +41,7 @@ def main():
     logger.debug(f"Number of artists : {n_artists}")
 
     dict_artists = {}
-    for index, artist in tqdm(enumerate(artists), total=n_artists):
+    for index, artist in tqdm(enumerate(artists), total=n_artists, dynamic_ncols=True):
         logger.debug(f"{index}: {artist}")
         dict = {}
         a = network.get_artist(artist)
@@ -82,12 +82,6 @@ def main():
 
     df_export_all = pd.DataFrame.from_dict(dict_artists, orient='index')
     df_export_all.to_csv(f"Exports/artists_information.csv", sep='\t')
-    # with open(f"Exports/artists_information.csv", 'w') as f:
-    #     f.write(f"Artist\tAlbum\tTitle\tDate\tTimestamp\n")
-    #     logger.debug("Exporting timeline")
-    #     for title in tqdm(tracks):
-    #         title_line = f"{title.track.artist}\t{title.album}\t{title.track.title}\t{title.playback_date}\t{title.timestamp}\n"
-    #         f.write(title_line)
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 

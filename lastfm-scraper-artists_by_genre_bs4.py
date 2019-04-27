@@ -26,7 +26,7 @@ def main():
         logger.error("Use the -g flag to input a genre to scrap.")
         exit()
     genres = genres.split(',')
-    for genre in tqdm(genres, dynamic_ncols=True):
+    for genre in tqdm(genres, dynamic_ncols=True, dynamic_ncols=True):
         try:
             url = f"https://www.last.fm/fr/tag/{genre}/artists"
             soup = BeautifulSoup(requests.get(url).content, 'lxml')

@@ -46,7 +46,7 @@ def main():
     with open(f"Exports/complete_timeline_{username}.txt", 'w') as f:
         f.write(f"Artist\tAlbum\tTitle\tDate\tTimestamp\n")
         logger.debug("Exporting timeline")
-        for title in tqdm(tracks):
+        for title in tqdm(tracks, dynamic_ncols=True):
             title_line = f"{title.track.artist}\t{title.album}\t{title.track.title}\t{title.playback_date}\t{title.timestamp}\n"
             f.write(title_line)
 
