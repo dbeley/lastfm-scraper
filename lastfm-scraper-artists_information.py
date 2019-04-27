@@ -78,7 +78,7 @@ def main():
         dict_artists[index] = dict
 
         df_export = pd.DataFrame.from_dict(dict, orient='index')
-        df_export.to_csv(f"Exports/Artists/{artist}_information.csv", sep='\t')
+        df_export.to_csv(f"Exports/Artists/{artist.replace('/', '_')}_information.csv", sep='\t')
 
     df_export_all = pd.DataFrame.from_dict(dict_artists, orient='index')
     df_export_all.to_csv(f"Exports/artists_information.csv", sep='\t')
