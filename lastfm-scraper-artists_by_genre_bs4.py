@@ -45,7 +45,7 @@ def main():
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     raise
-            with open(f"Exports/{genre}.txt", 'w') as f:
+            with open(f"Exports/{genre}_bs4.txt", 'w') as f:
                 for artist in artists:
                     f.write(f"{artist}\n")
         except Exception as e:
