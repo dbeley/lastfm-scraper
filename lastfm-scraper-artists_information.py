@@ -41,7 +41,7 @@ def main():
     logger.debug(f"Number of artists : {n_artists}")
 
     dict_artists = {}
-    for index, artist in tqdm(enumerate(artists), total=n_artists, dynamic_ncols=True):
+    for index, artist in tqdm(enumerate(artists, 1), total=n_artists, dynamic_ncols=True):
         logger.debug(f"{index}: {artist}")
         dict = {}
         a = network.get_artist(artist)
@@ -51,24 +51,24 @@ def main():
         dict['Playcount'] = a.get_playcount()
 
         tags = a.get_top_tags(20)
-        for i, t in enumerate(tags):
+        for i, t in enumerate(tags, 1):
             dict[f"Tag {i}"] = t.item.name
-            dict[f"Weight tag {i}"] = t.weight
+            dict[f"Tag {i} weight"] = t.weight
 
         tracks = a.get_top_tracks(10)
-        for i, t in enumerate(tracks):
+        for i, t in enumerate(tracks, 1):
             dict[f"Top track {i}"] = t.item.title
-            dict[f"Weight top track {i}"] = t.weight
+            dict[f"Top track {i} weight"] = t.weight
 
         albums = a.get_top_albums(10)
-        for i, t in enumerate(albums):
+        for i, t in enumerate(albums, 1):
             dict[f"Top album {i}"] = t.item.title
-            dict[f"Weight top album {i}"] = t.weight
+            dict[f"Top album {i} weight"] = t.weight
 
         similar = a.get_similar(50)
-        for i, t in enumerate(similar):
+        for i, t in enumerate(similar, 1):
             dict[f"Similar artist {i}"] = t.item.name
-            dict[f"Match similar artist {i}"] = t.match
+            dict[f"Similar artist {i} match"] = t.match
         try:
             os.makedirs('Exports/Artists/')
         except OSError as e:
