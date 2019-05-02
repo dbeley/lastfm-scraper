@@ -2,14 +2,14 @@
 
 Scripts to extract data from lastfm.
 
-## lastfm-artists_by_genre_bs4.py
+## Installation
 
 ```
-python lastfm-artists_by_genre_bs4.py -g pop,rock,metal,jazz,indie+rock
+pipenv install
 ```
 
-## lastfm-artists_by_genre_pylast.py
+## Usage
 
 ```
-python lastfm-artists_by_genre_pylast.py -g "pop,rock,metal,jazz,indie rock"
+pipenv run python lastfm-artists_by_genre_pylast.py -g "pop,rock,metal,jazz,indie rock"
 ```
