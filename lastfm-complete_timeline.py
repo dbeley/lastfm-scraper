@@ -31,7 +31,7 @@ def main():
     if file:
         df_initial = pd.read_csv(file, sep='\t')
         logger.debug(f"Columns : {list(df_initial)}")
-        max_timestamp = df_initial['Timestamp'].max()
+        max_timestamp = df_initial['Timestamp'].astype(int).max()
         logger.debug(f"Maximum timestamp = {max_timestamp}")
         # for small updates, limit=None works fine
         complete_tracks = user.get_recent_tracks(limit=None, time_from=max_timestamp)
@@ -74,10 +74,10 @@ def main():
     if file:
         df = pd.concat([df, df_initial], ignore_index=True, sort=True)
 
-    max_timestamp = df_initial['Timestamp'].max()
+    max_timestamp = df['Timestamp'].astype(int).max()
 
     logger.debug("Exporting dataframe")
-    df.to_csv(f"Exports/complete_timeline_{username}_{max_timestamp}.txt", sep='\t')
+    df.to_csv(f"Exports/complete_timeline_{username}_{max_timestamp}.txt", sep='\t', index=False)
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
