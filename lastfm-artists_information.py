@@ -3,10 +3,9 @@ import configparser
 import logging
 import time
 import argparse
-import os
-import errno
 import pandas as pd
 from tqdm import tqdm
+from pathlib import Path
 
 logger = logging.getLogger()
 temps_debut = time.time()
@@ -74,11 +73,8 @@ def main():
         for i, t in enumerate(similar, 1):
             dict[f"Similar artist {i}"] = t.item.name
             dict[f"Similar artist {i} match"] = t.match
-        try:
-            os.makedirs('Exports/Artists/')
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+
+        Path("Exports/Artists").mkdir(parents=True, exist_ok=True)
 
         dict_artists[index] = dict
 

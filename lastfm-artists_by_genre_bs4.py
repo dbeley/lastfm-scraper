@@ -2,10 +2,9 @@ import time
 import argparse
 import logging
 import requests
-import os
-import errno
 from tqdm import tqdm
 from bs4 import BeautifulSoup
+from pathlib import Path
 
 logger = logging.getLogger()
 
@@ -40,11 +39,7 @@ def main():
                 logger.debug(f"Next page : {url}/{lien}")
                 soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, 'lxml')
 
-            try:
-                os.makedirs('Exports')
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise
+            Path("Exports").mkdir(parents=True, exist_ok=True)
             with open(f"Exports/{genre}_bs4.txt", 'w') as f:
                 for artist in artists:
                     f.write(f"{artist}\n")

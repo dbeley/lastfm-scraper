@@ -3,9 +3,8 @@ import configparser
 import logging
 import time
 import argparse
-import os
-import errno
 import pandas as pd
+from pathlib import Path
 
 logger = logging.getLogger()
 temps_debut = time.time()
@@ -66,11 +65,7 @@ def main():
         timeline[index_timeline] = dict_track
         index_timeline += 1
 
-    try:
-        os.makedirs('Exports')
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+    Path("Exports").mkdir(parents=True, exist_ok=True)
 
     logger.debug("Creating dataframe")
     df = pd.DataFrame.from_dict(timeline, orient='index')

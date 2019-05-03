@@ -3,8 +3,7 @@ import configparser
 import logging
 import time
 import argparse
-import os
-import errno
+from pathlib import Path
 from tqdm import tqdm
 
 logger = logging.getLogger()
@@ -37,11 +36,8 @@ def main():
     for genre in tqdm(genres, dynamic_ncols=True):
         try:
             artists = [x.item.name for x in network.get_tag(genre).get_top_artists(limit=1000)]
-            try:
-                os.makedirs('Exports')
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise
+
+            Path("Exports").mkdir(parents=True, exist_ok=True)
             with open(f"Exports/{genre}_pylast.txt", 'w') as f:
                 for artist in artists:
                     f.write(f"{artist}\n")
