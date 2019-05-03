@@ -11,14 +11,7 @@ logger = logging.getLogger()
 temps_debut = time.time()
 
 
-def main():
-    args = parse_args()
-    genres = args.genres
-    if not genres:
-        logger.error("Use the -g flag to input a genre to scrap.")
-        exit()
-    genres = genres.split(',')
-
+def lastfmconnect():
     config = configparser.ConfigParser()
     config.read('config.ini')
     API_KEY = config['lastfm']['API_KEY']
@@ -28,6 +21,18 @@ def main():
 
     network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
                                    username=username, password_hash=password)
+    return network
+
+
+def main():
+    args = parse_args()
+    genres = args.genres
+    if not genres:
+        logger.error("Use the -g flag to input a genre to scrap.")
+        exit()
+    genres = genres.split(',')
+
+    network = lastfmconnect()
 
     for genre in tqdm(genres, dynamic_ncols=True):
         try:

@@ -12,14 +12,7 @@ logger = logging.getLogger()
 temps_debut = time.time()
 
 
-def main():
-    args = parse_args()
-    file = args.file
-    artist = args.artist
-    if not file and not artist:
-        logger.error("Use the -f/--file or the -a/--artist flags to input one or several artists to search")
-        exit()
-
+def lastfmconnect():
     config = configparser.ConfigParser()
     config.read('config.ini')
     API_KEY = config['lastfm']['API_KEY']
@@ -29,6 +22,18 @@ def main():
 
     network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
                                    username=username, password_hash=password)
+    return network
+
+
+def main():
+    args = parse_args()
+    file = args.file
+    artist = args.artist
+    if not file and not artist:
+        logger.error("Use the -f/--file or the -a/--artist flags to input one or several artists to search")
+        exit()
+
+    network = lastfmconnect()
 
     if artist:
         artists = artist.split(',')
@@ -87,9 +92,9 @@ def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Python skeleton')
+    parser = argparse.ArgumentParser(description='Extract information from artists from a timeline or from a list')
     parser.add_argument('--debug', help="Display debugging information", action="store_const", dest="loglevel", const=logging.DEBUG, default=logging.INFO)
-    parser.add_argument('-f', '--file', help='File containing the timeline', type=str)
+    parser.add_argument('-f', '--file', help='File containing the timeline to extract the unique artists from', type=str)
     parser.add_argument('-a', '--artist', help='Artists (separated by comma)', type=str)
     args = parser.parse_args()
 

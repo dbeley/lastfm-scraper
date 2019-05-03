@@ -11,11 +11,7 @@ logger = logging.getLogger()
 temps_debut = time.time()
 
 
-def main():
-    args = parse_args()
-    file = args.file
-    username = args.username
-
+def lastfmconnect():
     config = configparser.ConfigParser()
     config.read('config.ini')
     API_KEY = config['lastfm']['API_KEY']
@@ -25,7 +21,14 @@ def main():
 
     network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
                                    username=api_username, password_hash=api_password)
+    return network
 
+
+def main():
+    args = parse_args()
+    file = args.file
+    username = args.username
+    network = lastfmconnect()
     user = network.get_user(username)
 
     if file:
@@ -83,7 +86,7 @@ def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Python skeleton')
+    parser = argparse.ArgumentParser(description='Extract complete or partial lastfm timeline from an user')
     parser.add_argument('--debug', help="Display debugging information", action="store_const", dest="loglevel", const=logging.DEBUG, default=logging.INFO)
     parser.add_argument('--file', '-f', help="File already containing a timeline", type=str)
     parser.add_argument('--username', '-u', help="Name of the user", type=str)
