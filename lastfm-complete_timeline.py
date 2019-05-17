@@ -25,32 +25,30 @@ def lastfmconnect():
 
 def main():
     args = parse_args()
-    file = args.file
-    username = args.username
     network = lastfmconnect()
-    user = network.get_user(username)
+    user = network.get_user(args.username)
 
-    if file:
-        df_initial = pd.read_csv(file, sep='\t')
-        logger.debug(f"Columns : {list(df_initial)}")
+    if args.file:
+        df_initial = pd.read_csv(args.file, sep='\t')
+        logger.debug("Columns : %s", list(df_initial))
         max_timestamp = df_initial['Timestamp'].astype(int).max()
-        logger.debug(f"Maximum timestamp = {max_timestamp}")
+        logger.debug("Maximum timestamp = %s", max_timestamp)
         # for small updates, limit=None works fine
         complete_tracks = user.get_recent_tracks(limit=None, time_from=max_timestamp)
-        logger.debug(f"Length complete_tracks : {len(complete_tracks)}")
+        logger.debug("Length complete_tracks : %s", len(complete_tracks))
     else:
         complete_tracks = []
         # can't do limit=None here, it throws an error after some time
         new_tracks = user.get_recent_tracks(limit=100)
         complete_tracks = complete_tracks + new_tracks
-        logger.debug(f"Length complete_tracks : {len(complete_tracks)}")
+        logger.debug("Length complete_tracks : %s", len(complete_tracks))
         while new_tracks:
             last_timestamp = new_tracks[-1].timestamp
-            logger.debug(f"Last timestamp : {last_timestamp}")
+            logger.debug("Last timestamp : %s", last_timestamp)
             try:
                 new_tracks = user.get_recent_tracks(limit=100, time_to=last_timestamp)
                 complete_tracks = complete_tracks + new_tracks
-                logger.debug(f"Length complete_tracks : {len(complete_tracks)}")
+                logger.debug("Length complete_tracks : %s", len(complete_tracks))
             except Exception as e:
                 logger.error(e)
 
@@ -69,13 +67,13 @@ def main():
 
     logger.debug("Creating dataframe")
     df = pd.DataFrame.from_dict(timeline, orient='index')
-    if file:
+    if args.file:
         df = pd.concat([df, df_initial], ignore_index=True, sort=True)
 
     max_timestamp = df['Timestamp'].astype(int).max()
 
     logger.debug("Exporting dataframe")
-    df.to_csv(f"Exports/complete_timeline_{username}_{max_timestamp}.txt", sep='\t', index=False)
+    df.to_csv(f"Exports/complete_timeline_{args.username}_{max_timestamp}.txt", sep='\t', index=False)
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 

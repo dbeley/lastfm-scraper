@@ -26,27 +26,25 @@ def lastfmconnect():
 
 def main():
     args = parse_args()
-    file = args.file
-    artist = args.artist
-    if not file and not artist:
+    if not args.file and not args.artist:
         logger.error("Use the -f/--file or the -a/--artist flags to input one or several artists to search")
         exit()
 
     network = lastfmconnect()
 
-    if artist:
-        artists = artist.split(',')
+    if args.artist:
+        artists = args.artist.split(',')
     else:
-        df = pd.read_csv(file, sep='\t', encoding='utf-8')
+        df = pd.read_csv(args.file, sep='\t', encoding='utf-8')
         df.columns = ['Artist', 'Album', 'Track', 'Date', 'Timestamp']
         logger.debug(df.columns)
         artists = df.Artist.unique()
     n_artists = len(artists)
-    logger.debug(f"Number of artists : {n_artists}")
+    logger.debug("Number of artists : %s", n_artists)
 
     dict_artists = {}
     for index, artist in tqdm(enumerate(artists, 1), total=n_artists, dynamic_ncols=True):
-        logger.debug(f"{index}: {artist}")
+        logger.debug("%s: {artist}", index)
         dict = {}
         a = network.get_artist(artist)
         dict['Name'] = a.get_name()

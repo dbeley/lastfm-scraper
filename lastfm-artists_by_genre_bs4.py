@@ -20,11 +20,10 @@ def get_artists(soup):
 
 def main():
     args = parse_args()
-    genres = args.genres
-    if not genres:
+    if not args.genres:
         logger.error("Use the -g flag to input a genre to scrap.")
         exit()
-    genres = genres.split(',')
+    genres = args.genres.split(',')
     for genre in tqdm(genres, dynamic_ncols=True):
         try:
             url = f"https://www.last.fm/fr/tag/{genre}/artists"
@@ -34,9 +33,9 @@ def main():
             while soup.find('li', {'class': 'pagination-next'}):
 
                 artists = artists + get_artists(soup)
-                logger.debug(f"Total artists number : {len(artists)}")
+                logger.debug("Total artists number : %s", len(artists))
                 lien = soup.find('li', {'class': 'pagination-next'}).find('a')['href']
-                logger.debug(f"Next page : {url}/{lien}")
+                logger.debug("Next page : %s/{lien}", url)
                 soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, 'lxml')
 
             Path("Exports").mkdir(parents=True, exist_ok=True)
@@ -44,7 +43,7 @@ def main():
                 for artist in artists:
                     f.write(f"{artist}\n")
         except Exception as e:
-            logger.error(f"{e}")
+            logger.error("%s", e)
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 

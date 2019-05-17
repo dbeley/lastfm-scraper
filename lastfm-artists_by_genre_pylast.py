@@ -25,11 +25,10 @@ def lastfmconnect():
 
 def main():
     args = parse_args()
-    genres = args.genres
-    if not genres:
+    if not args.genres:
         logger.error("Use the -g flag to input a genre to scrap.")
         exit()
-    genres = genres.split(',')
+    genres = args.genres.split(',')
 
     network = lastfmconnect()
 
@@ -42,7 +41,7 @@ def main():
                 for artist in artists:
                     f.write(f"{artist}\n")
         except Exception as e:
-            logger.error(f"{e}")
+            logger.error("%s", e)
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
