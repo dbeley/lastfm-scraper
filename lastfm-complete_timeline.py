@@ -26,7 +26,11 @@ def lastfmconnect():
 def main():
     args = parse_args()
     network = lastfmconnect()
-    user = network.get_user(args.username)
+    if args.username:
+        user = network.get_user(args.username)
+    else:
+        logger.error("Use the -u/--username flag to set an username.")
+        exit()
 
     if args.file:
         df_initial = pd.read_csv(args.file, sep='\t')
