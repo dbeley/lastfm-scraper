@@ -13,8 +13,8 @@ temps_debut = time.time()
 
 def get_artists(soup):
     artists = []
-    for item in soup.findAll('h3', {'class': 'big-artist-list-title'}):
-        artists.append(item.find('a').text)
+    for item in soup.findAll("h3", {"class": "big-artist-list-title"}):
+        artists.append(item.find("a").text)
     return artists
 
 
@@ -23,23 +23,27 @@ def main():
     if not args.genres:
         logger.error("Use the -g flag to input a genre to scrap.")
         exit()
-    genres = args.genres.split(',')
+    genres = args.genres.split(",")
     for genre in tqdm(genres, dynamic_ncols=True):
         try:
             url = f"https://www.last.fm/fr/tag/{genre}/artists"
-            soup = BeautifulSoup(requests.get(url).content, 'lxml')
+            soup = BeautifulSoup(requests.get(url).content, "lxml")
             artists = []
 
-            while soup.find('li', {'class': 'pagination-next'}):
+            while soup.find("li", {"class": "pagination-next"}):
 
                 artists = artists + get_artists(soup)
                 logger.debug("Total artists number : %s", len(artists))
-                lien = soup.find('li', {'class': 'pagination-next'}).find('a')['href']
+                lien = soup.find("li", {"class": "pagination-next"}).find("a")[
+                    "href"
+                ]
                 logger.debug("Next page : %s/{lien}", url)
-                soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, 'lxml')
+                soup = BeautifulSoup(
+                    requests.get(f"{url}/{lien}").content, "lxml"
+                )
 
             Path("Exports").mkdir(parents=True, exist_ok=True)
-            with open(f"Exports/{genre}_bs4.txt", 'w') as f:
+            with open(f"Exports/{genre}_bs4.txt", "w") as f:
                 for artist in artists:
                     f.write(f"{artist}\n")
         except Exception as e:
@@ -49,14 +53,23 @@ def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Genre lastfm scraper')
-    parser.add_argument('--debug', help="Display debugging information", action="store_const", dest="loglevel", const=logging.DEBUG, default=logging.WARNING)
-    parser.add_argument('-g', '--genres', type=str, help='Genres to scrap (separated by comma)')
+    parser = argparse.ArgumentParser(description="Genre lastfm scraper")
+    parser.add_argument(
+        "--debug",
+        help="Display debugging information",
+        action="store_const",
+        dest="loglevel",
+        const=logging.DEBUG,
+        default=logging.WARNING,
+    )
+    parser.add_argument(
+        "-g", "--genres", type=str, help="Genres to scrap (separated by comma)"
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel)
     return args
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
