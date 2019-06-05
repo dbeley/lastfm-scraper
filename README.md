@@ -1,4 +1,4 @@
-# lastfm-scripts
+# lastfm-scraper
 
 Scripts to extract data from lastfm.
 
