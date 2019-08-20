@@ -54,17 +54,20 @@ def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Genre lastfm scraper")
+    parser = argparse.ArgumentParser(description="Genre lastfm scraper.")
     parser.add_argument(
         "--debug",
-        help="Display debugging information",
+        help="Display debugging information.",
         action="store_const",
         dest="loglevel",
         const=logging.DEBUG,
         default=logging.INFO,
     )
     parser.add_argument(
-        "-g", "--genres", type=str, help="Genres to scrap (separated by comma)"
+        "-g",
+        "--genres",
+        type=str,
+        help="Genres to scrap (separated by comma).",
     )
     args = parser.parse_args()
 

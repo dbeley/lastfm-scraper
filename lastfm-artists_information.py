@@ -6,6 +6,8 @@ import argparse
 import pandas as pd
 from tqdm import tqdm
 from pathlib import Path
+import requests
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger()
 temps_debut = time.time()
@@ -26,6 +28,22 @@ def lastfmconnect():
         password_hash=password,
     )
     return network
+
+
+def get_country(url_artist):
+    soup = BeautifulSoup(requests.get(url_artist).content, "lxml")
+    place = soup.find("dt", string="Founded In")
+    if place:
+        place = place.findNext().text
+    else:
+        place = soup.find("dt", string="Born In")
+        if place:
+            place = place.findNext().text
+        else:
+            place = None
+    if place:
+        return place.split(", ")[-1]
+    return None
 
 
 def main():
@@ -59,6 +77,7 @@ def main():
         dict["URL"] = a.get_url()
         dict["Listeners"] = a.get_listener_count()
         dict["Playcount"] = a.get_playcount()
+        dict["Country"] = get_country(dict["URL"])
 
         tags = a.get_top_tags(20)
         for i, t in enumerate(tags, 1):
@@ -98,11 +117,11 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Extract information from artists from a timeline or from a list"
+        description="Extract information from artists from a timeline or from a list."
     )
     parser.add_argument(
         "--debug",
-        help="Display debugging information",
+        help="Display debugging information.",
         action="store_const",
         dest="loglevel",
         const=logging.DEBUG,
@@ -111,11 +130,11 @@ def parse_args():
     parser.add_argument(
         "-f",
         "--file",
-        help="File containing the timeline to extract the unique artists from",
+        help="File containing the timeline to extract the unique artists from.",
         type=str,
     )
     parser.add_argument(
-        "-a", "--artist", help="Artists (separated by comma)", type=str
+        "-a", "--artist", help="Artists (separated by comma).", type=str
     )
     args = parser.parse_args()
 

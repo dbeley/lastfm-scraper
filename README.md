@@ -4,7 +4,6 @@ Scripts to extract data from lastfm.
 
 ## Requirements
 
-- tqdm
 - bs4
 - lxml
 - numpy
