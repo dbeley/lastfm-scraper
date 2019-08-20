@@ -50,14 +50,14 @@ def main():
     args = parse_args()
     if not args.file and not args.artist:
         logger.error(
-            "Use the -f/--file or the -a/--artist flags to input one or several artists to search"
+            "Use the -f/--file or the -a/--artist flags to input one or several artists to search."
         )
         exit()
 
     network = lastfmconnect()
 
     if args.artist:
-        artists = args.artist.split(",")
+        artists = [x.strip() for x in args.artist.split(",")]
     else:
         df = pd.read_csv(args.file, sep="\t", encoding="utf-8")
         df.columns = ["Artist", "Album", "Track", "Date", "Timestamp"]
@@ -66,11 +66,10 @@ def main():
     n_artists = len(artists)
     logger.debug("Number of artists : %s", n_artists)
 
-    dict_artists = {}
-    for index, artist in tqdm(
-        enumerate(artists, 1), total=n_artists, dynamic_ncols=True
-    ):
-        logger.debug("%s: {artist}", index)
+    Path("Exports/Artists").mkdir(parents=True, exist_ok=True)
+
+    list_dict = []
+    for artist in tqdm(artists, total=n_artists, dynamic_ncols=True):
         dict = {}
         a = network.get_artist(artist)
         dict["Name"] = a.get_name()
@@ -99,18 +98,19 @@ def main():
             dict[f"Similar artist {i}"] = t.item.name
             dict[f"Similar artist {i} match"] = t.match
 
-        Path("Exports/Artists").mkdir(parents=True, exist_ok=True)
+        list_dict.append(dict)
 
-        dict_artists[index] = dict
-
+        # Export csv containing data for the artist.
         df_export = pd.DataFrame.from_dict(dict, orient="index")
         df_export.to_csv(
             f"Exports/Artists/{artist.replace('/', '_')}_information.csv",
             sep="\t",
         )
 
-    df_export_all = pd.DataFrame.from_dict(dict_artists, orient="index")
-    df_export_all.to_csv(f"Exports/artists_information.csv", sep="\t")
+    # Export csv containing data for all the artists.
+    pd.DataFrame.from_records(list_dict).to_csv(
+        f"Exports/artists_information.csv", sep="\t", index=False
+    )
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 

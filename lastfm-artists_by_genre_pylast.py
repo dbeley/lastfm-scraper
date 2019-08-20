@@ -30,11 +30,15 @@ def lastfmconnect():
 def main():
     args = parse_args()
     if not args.genres:
-        logger.error("Use the -g flag to input a genre to scrap.")
+        logger.error(
+            "Use the -g flag to input one or several (separated by comma) genres to scrap."
+        )
         exit()
-    genres = args.genres.split(",")
+    genres = [x.strip() for x in args.genres.split(",")]
 
     network = lastfmconnect()
+
+    Path("Exports").mkdir(parents=True, exist_ok=True)
 
     for genre in tqdm(genres, dynamic_ncols=True):
         try:
@@ -43,7 +47,6 @@ def main():
                 for x in network.get_tag(genre).get_top_artists(limit=1000)
             ]
 
-            Path("Exports").mkdir(parents=True, exist_ok=True)
             with open(f"Exports/{genre}_pylast.txt", "w") as f:
                 for artist in artists:
                     f.write(f"{artist}\n")

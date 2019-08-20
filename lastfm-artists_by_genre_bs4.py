@@ -23,7 +23,10 @@ def main():
     if not args.genres:
         logger.error("Use the -g flag to input a genre to scrap.")
         exit()
-    genres = args.genres.split(",")
+    genres = [x.strip() for x in args.genres.split(",")]
+
+    Path("Exports").mkdir(parents=True, exist_ok=True)
+
     for genre in tqdm(genres, dynamic_ncols=True):
         try:
             url = f"https://www.last.fm/fr/tag/{genre}/artists"
@@ -41,8 +44,6 @@ def main():
                 soup = BeautifulSoup(
                     requests.get(f"{url}/{lien}").content, "lxml"
                 )
-
-            Path("Exports").mkdir(parents=True, exist_ok=True)
             with open(f"Exports/{genre}_bs4.txt", "w") as f:
                 for artist in artists:
                     f.write(f"{artist}\n")

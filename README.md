@@ -2,6 +2,10 @@
 
 Scripts to extract data from lastfm.
 
+- lastfm-artists_by_genre : Exports artists name from one or several genres to csv files (2 backends available, beautifulsoup4 and pylast).
+- lastfm-artists_information : Exports data for one or several artists (Fields : Name, URL, Listeners, Playcount, Country, Tags, Top Tracks, Top Albums, Similar Artists). Slow (~10s/artist)
+- lastfm-complete_timeline : Exports all the scrobbles of one or several users in csv files (Fields : Artist, Album, Title, Date, Timestamp).
+
 ## Requirements
 
 - bs4
@@ -21,6 +25,8 @@ pipenv install
 
 ```
 python lastfm-artists_by_genre_pylast.py -g "pop,rock,metal,jazz,indie rock"
+python lastfm-artists_information.py -a "daft punk,u2,radiohead"
+python lastfm-complete_timeline.py -u USERNAME
 ```
 
 ## Help
