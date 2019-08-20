@@ -47,7 +47,7 @@ def main():
                 for x in network.get_tag(genre).get_top_artists(limit=1000)
             ]
 
-            with open(f"Exports/{genre}_pylast.txt", "w") as f:
+            with open(f"Exports/{genre}_pylast.csv", "w") as f:
                 for artist in artists:
                     f.write(f"{artist}\n")
         except Exception as e:

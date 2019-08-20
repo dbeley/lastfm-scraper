@@ -93,7 +93,7 @@ def main():
         max_timestamp = df["Timestamp"].max()
 
         export_filename = (
-            f"Exports/complete_timeline_{user}_{max_timestamp}.txt"
+            f"Exports/complete_timeline_{user}_{max_timestamp}.csv"
         )
         logger.info("Exporting timeline to %s.", export_filename)
         df.to_csv(

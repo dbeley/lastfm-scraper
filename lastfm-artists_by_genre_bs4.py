@@ -44,7 +44,7 @@ def main():
                 soup = BeautifulSoup(
                     requests.get(f"{url}/{lien}").content, "lxml"
                 )
-            with open(f"Exports/{genre}_bs4.txt", "w") as f:
+            with open(f"Exports/{genre}_bs4.csv", "w") as f:
                 for artist in artists:
                     f.write(f"{artist}\n")
         except Exception as e:
