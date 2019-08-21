@@ -2,6 +2,8 @@
 
 Scripts to extract data from lastfm.
 
+The scripts need a valid config file with your lastfm API keys (get them at last.fm/api.) in a config.ini file (see config_sample.ini for an example).
+
 - lastfm-artists_by_genre : Exports artists name from one or several genres to csv files (2 backends available, beautifulsoup4 and pylast).
 - lastfm-artists_information : Exports data for one or several artists (Fields : Name, URL, Listeners, Playcount, Country, Tags, Top Tracks, Top Albums, Similar Artists). Slow (~10s/artist)
 - lastfm-complete_timeline : Exports all the scrobbles of one or several users in csv files (Fields : Artist, Album, Title, Date, Timestamp).
