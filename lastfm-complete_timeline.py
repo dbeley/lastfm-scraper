@@ -46,13 +46,14 @@ def main():
             df_initial = pd.read_csv(args.file, sep="\t")
             df_initial = df_initial.astype({"Timestamp": int})
             logger.debug("Columns : %s", list(df_initial))
+            # Getting the timestamp of the most recent scrobble
             max_timestamp = df_initial["Timestamp"].max()
-            logger.debug("Maximum timestamp = %s", max_timestamp)
-            # For small updates, limit=None works fine.
             logger.info("Extracting scrobbles since %s.", max_timestamp)
+            # Delete the last scrobble (it's the one with max_timestamp)
+            # For small updates, limit=None works fine.
             complete_tracks = user.get_recent_tracks(
                 limit=None, time_from=max_timestamp
-            )[2:]
+            )[:-1]
             logger.debug("Length complete_tracks : %s", len(complete_tracks))
         else:
             complete_tracks = []
