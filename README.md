@@ -7,6 +7,7 @@ The scripts need a valid config file with your lastfm API keys (get them at last
 - lastfm-artists_by_genre : Exports artists name from one or several genres to csv files (2 backends available, beautifulsoup4 and pylast).
 - lastfm-artists_information : Exports data for one or several artists (Fields : Name, URL, Listeners, Playcount, Country, Tags, Top Tracks, Top Albums, Similar Artists). Slow (~10s/artist)
 - lastfm-complete_timeline : Exports all the scrobbles of one or several users in csv files (Fields : Artist, Album, Title, Date, Timestamp).
+- lastfm-all_favorite_tracks : Exports all favorite tracks of one or several users in csv files (Format : Artist - Track)
 
 ## Requirements
 
@@ -29,6 +30,7 @@ pipenv install
 python lastfm-artists_by_genre_pylast.py -g "pop,rock,metal,jazz,indie rock"
 python lastfm-artists_information.py -a "daft punk,u2,radiohead"
 python lastfm-complete_timeline.py -u USERNAME
+python lastfm-all_favorite_tracks -u USERNAME
 ```
 
 ## Help
@@ -109,3 +111,20 @@ optional arguments:
                         Genres to scrap (separated by comma)
 ```
 
+### lastfm-all_favorite_tracks
+
+```
+python lastfm-all_favorite_tracks.py -h
+```
+
+```
+usage: lastfm-all_favorite_tracks.py [-h] [--debug] [--username USERNAME]
+
+Extract all favorite tracks from one or several lastfm users.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --debug               Display debugging information.
+  --username USERNAME, -u USERNAME
+                        Names of the users (separated by comma).
+```

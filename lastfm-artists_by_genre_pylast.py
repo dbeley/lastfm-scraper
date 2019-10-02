@@ -13,14 +13,14 @@ temps_debut = time.time()
 def lastfmconnect():
     config = configparser.ConfigParser()
     config.read("config.ini")
-    API_KEY = config["lastfm"]["API_KEY"]
-    API_SECRET = config["lastfm"]["API_SECRET"]
+    api_key = config["lastfm"]["api_key"]
+    api_secret = config["lastfm"]["api_secret"]
     username = config["lastfm"]["username"]
     password = pylast.md5(config["lastfm"]["password"])
 
     network = pylast.LastFMNetwork(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
+        api_key=api_key,
+        api_secret=api_secret,
         username=username,
         password_hash=password,
     )
