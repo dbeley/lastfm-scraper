@@ -27,6 +27,28 @@ def lastfmconnect():
     return network
 
 
+def fetch_new_tracks(user, min_timestamp=None, max_timestamp=None):
+    complete_tracks = []
+    # Can't do limit=None here, it throws an error after some time.
+    new_tracks = user.get_recent_tracks(
+        limit=100, time_from=min_timestamp, time_to=max_timestamp
+    )
+    complete_tracks = complete_tracks + new_tracks
+    logger.info("%s tracks extracted.", len(complete_tracks))
+    while new_tracks:
+        last_timestamp = new_tracks[-1].timestamp
+        logger.debug("Last timestamp : %s", last_timestamp)
+        try:
+            new_tracks = user.get_recent_tracks(
+                limit=100, time_to=last_timestamp, time_from=min_timestamp
+            )
+            complete_tracks = complete_tracks + new_tracks
+            logger.info("%s tracks extracted.", len(complete_tracks))
+        except Exception as e:
+            logger.error(e)
+    return complete_tracks
+
+
 def main():
     args = parse_args()
     network = lastfmconnect()
@@ -49,29 +71,13 @@ def main():
             # Getting the timestamp of the most recent scrobble
             max_timestamp = df_initial["Timestamp"].max()
             logger.info("Extracting scrobbles since %s.", max_timestamp)
-            # Delete the last scrobble (it's the one with max_timestamp)
-            # For small updates, limit=None works fine.
-            complete_tracks = user.get_recent_tracks(
-                limit=None, time_from=max_timestamp
-            )[:-1]
+
+            complete_tracks = fetch_new_tracks(
+                user, min_timestamp=max_timestamp
+            )
             logger.debug("Length complete_tracks : %s", len(complete_tracks))
         else:
-            complete_tracks = []
-            # Can't do limit=None here, it throws an error after some time.
-            new_tracks = user.get_recent_tracks(limit=100)
-            complete_tracks = complete_tracks + new_tracks
-            logger.info("%s tracks extracted.", len(complete_tracks))
-            while new_tracks:
-                last_timestamp = new_tracks[-1].timestamp
-                logger.debug("Last timestamp : %s", last_timestamp)
-                try:
-                    new_tracks = user.get_recent_tracks(
-                        limit=100, time_to=last_timestamp
-                    )
-                    complete_tracks = complete_tracks + new_tracks
-                    logger.info("%s tracks extracted.", len(complete_tracks))
-                except Exception as e:
-                    logger.error(e)
+            complete_tracks = fetch_new_tracks(user)
 
         timeline = []
         for new_track in complete_tracks:
