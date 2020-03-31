@@ -136,11 +136,11 @@
         },
         "pylast": {
             "hashes": [
-                "sha256:87c433ac63b592c92a5e8d5176fc8b65794ca239f7e295e6e46851e0c67b11d5",
-                "sha256:fd92e969fc7dafb2b693e7124ed6cd6c4fc3382c9eaa273025a845f9410ddcd5"
+                "sha256:3c984be04c9a22a884c3106a7f75749466d27c68870d6fb7e1f56b71becea7c0",
+                "sha256:8ba8d62e2c2af1d8a99878d7f7e91684c52dd3d2236b831b1fe2cbfcc664356d"
             ],
             "index": "pypi",
-            "version": "==3.2.0"
+            "version": "==3.2.1"
         },
         "python-dateutil": {
             "hashes": [
