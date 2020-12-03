@@ -4,9 +4,10 @@ import logging
 import time
 import argparse
 import pandas as pd
+import requests
+import time
 from tqdm import tqdm
 from pathlib import Path
-import requests
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger()
@@ -60,7 +61,6 @@ def main():
         artists = [x.strip() for x in args.artist.split(",")]
     else:
         df = pd.read_csv(args.file, sep="\t", encoding="utf-8")
-        df.columns = ["Artist", "Album", "Track", "Date", "Timestamp"]
         logger.debug(df.columns)
         artists = df.Artist.unique()
     n_artists = len(artists)
@@ -71,45 +71,55 @@ def main():
     list_dict = []
     for artist in tqdm(artists, total=n_artists, dynamic_ncols=True):
         dict = {}
-        a = network.get_artist(artist)
-        dict["Name"] = a.get_name()
-        dict["URL"] = a.get_url()
-        dict["Listeners"] = a.get_listener_count()
-        dict["Playcount"] = a.get_playcount()
-        dict["Country"] = get_country(dict["URL"])
-
-        tags = a.get_top_tags(20)
-        for i, t in enumerate(tags, 1):
-            dict[f"Tag {i}"] = t.item.name
-            dict[f"Tag {i} weight"] = t.weight
-
-        tracks = a.get_top_tracks(10)
-        for i, t in enumerate(tracks, 1):
-            dict[f"Top track {i}"] = t.item.title
-            dict[f"Top track {i} weight"] = t.weight
-
-        albums = a.get_top_albums(10)
-        for i, t in enumerate(albums, 1):
-            dict[f"Top album {i}"] = t.item.title
-            dict[f"Top album {i} weight"] = t.weight
-
-        similar = a.get_similar(50)
-        for i, t in enumerate(similar, 1):
-            dict[f"Similar artist {i}"] = t.item.name
-            dict[f"Similar artist {i} match"] = t.match
-
+        n_tries = 0
+        while True:
+            try:
+                n_tries += 1
+                a = network.get_artist(artist)
+                dict["Name"] = a.get_name()
+                dict["URL"] = a.get_url()
+                dict["Listeners"] = int(a.get_listener_count())
+                dict["Playcount"] = int(a.get_playcount())
+                dict["Country"] = get_country(dict["URL"])
+                break
+            except Exception as e:
+                logger.warning(f"{artist} try {n_tries}: {e}.")
+                time.sleep(3)
+                if n_tries > 4:
+                    break
+        logger.debug(dict)
         list_dict.append(dict)
 
-        # Export csv containing data for the artist.
-        df_export = pd.DataFrame.from_dict(dict, orient="index")
-        df_export.to_csv(
-            f"Exports/Artists/{artist.replace('/', '_')}_information.csv",
-            sep="\t",
-        )
+        # tags = a.get_top_tags(20)
+        # for i, t in enumerate(tags, 1):
+        #     dict[f"Tag {i}"] = t.item.name
+        #     dict[f"Tag {i} weight"] = t.weight
+
+        # tracks = a.get_top_tracks(10)
+        # for i, t in enumerate(tracks, 1):
+        #     dict[f"Top track {i}"] = t.item.title
+        #     dict[f"Top track {i} weight"] = t.weight
+
+        # albums = a.get_top_albums(10)
+        # for i, t in enumerate(albums, 1):
+        #     dict[f"Top album {i}"] = t.item.title
+        #     dict[f"Top album {i} weight"] = t.weight
+
+        # similar = a.get_similar(50)
+        # for i, t in enumerate(similar, 1):
+        #     dict[f"Similar artist {i}"] = t.item.name
+        #     dict[f"Similar artist {i} match"] = t.match
+
+        # # Export csv containing data for the artist.
+        # df_export = pd.DataFrame.from_dict(dict, orient="index")
+        # df_export.to_csv(
+        #     f"Exports/Artists/{artist.replace('/', '_')}_infos.csv",
+        #     sep="\t",
+        # )
 
     # Export csv containing data for all the artists.
     pd.DataFrame.from_records(list_dict).to_csv(
-        f"Exports/artists_information.csv", sep="\t", index=False
+        f"Exports/complete_artists_infos.csv", sep="\t", index=False
     )
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
@@ -117,7 +127,7 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Extract information from artists from a timeline or from a list."
+        description="Extract infos from artists from a timeline or from a list."
     )
     parser.add_argument(
         "--debug",

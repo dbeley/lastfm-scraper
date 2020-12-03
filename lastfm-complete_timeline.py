@@ -69,12 +69,10 @@ def main():
             df_initial = df_initial.astype({"Timestamp": int})
             logger.debug("Columns : %s", list(df_initial))
             # Getting the timestamp of the most recent scrobble
-            max_timestamp = df_initial["Timestamp"].max()
+            max_timestamp = df_initial["Timestamp"].max() + 1
             logger.info("Extracting scrobbles since %s.", max_timestamp)
 
-            complete_tracks = fetch_new_tracks(
-                user, min_timestamp=max_timestamp
-            )
+            complete_tracks = fetch_new_tracks(user, min_timestamp=max_timestamp)
             logger.debug("Length complete_tracks : %s", len(complete_tracks))
         else:
             complete_tracks = fetch_new_tracks(user)
@@ -93,15 +91,13 @@ def main():
         logger.debug("Creating final dataframe")
         df = pd.DataFrame.from_records(timeline)
         df = df.astype({"Timestamp": int})
-        if args.file:
+        if args.file and not args.partial_export:
             df = pd.concat([df, df_initial], ignore_index=True, sort=True)
 
         df = df.sort_values(by=["Timestamp"])
         max_timestamp = df["Timestamp"].max()
 
-        export_filename = (
-            f"Exports/complete_timeline_{user}_{max_timestamp}.csv"
-        )
+        export_filename = f"Exports/complete_timeline_{user}_{max_timestamp}.csv"
         logger.info("Exporting timeline to %s.", export_filename)
         df.to_csv(
             export_filename,
@@ -132,11 +128,18 @@ def parse_args():
         type=str,
     )
     parser.add_argument(
+        "--partial_export",
+        help="Only export new tracks. Needs to be used with the --file argument to be effective.",
+        dest="partial_export",
+        action="store_true",
+    )
+    parser.add_argument(
         "--username",
         "-u",
         help="Names of the users (separated by comma).",
         type=str,
     )
+    parser.set_defaults(partial_export=False)
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel)
