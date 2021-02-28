@@ -3,7 +3,6 @@ import configparser
 import logging
 import time
 import argparse
-import pandas as pd
 from pathlib import Path
 
 logger = logging.getLogger()
@@ -46,7 +45,7 @@ def main():
         loved_tracks = [x.track for x in loved_tracks]
         logger.info("%s tracks extracted for %s.", len(loved_tracks), user)
 
-        with open(f"Exports/{user}_favorite_tracks.csv", "w") as f:
+        with open(f"Exports/{int(time.time())}_{user}_favorite_tracks.csv", "w") as f:
             for track in loved_tracks:
                 f.write(f"{track.artist} - {track.title}\n")
 
