@@ -2,3 +2,4 @@ Exports/
 config.ini
 tags
 .venv/
+.direnv
