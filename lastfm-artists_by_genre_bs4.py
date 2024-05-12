@@ -21,8 +21,7 @@ def get_artists(soup):
 def main():
     args = parse_args()
     if not args.genres:
-        logger.error("Use the -g flag to input a genre to scrap.")
-        exit()
+        raise Exception("Use the -g flag to input a genre to scrap.")
     genres = [x.strip() for x in args.genres.split(",")]
 
     Path("Exports").mkdir(parents=True, exist_ok=True)

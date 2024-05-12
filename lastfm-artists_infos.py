@@ -50,10 +50,9 @@ def get_country(url_artist):
 def main():
     args = parse_args()
     if not args.file and not args.artist:
-        logger.error(
+        raise Exception(
             "Use the -f/--file or the -a/--artist flags to input one or several artists to search."
         )
-        exit()
 
     network = lastfmconnect()
 

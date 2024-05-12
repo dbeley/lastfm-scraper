@@ -2,12 +2,12 @@
 
 Scripts to extract data from lastfm.
 
-The scripts need a valid config file with your lastfm API keys (get them at last.fm/api.) in a config.ini file (see config_sample.ini for an example).
+The scripts need a valid config file with your lastfm API keys (get them at last.fm/api.) in a `config.ini` file (see `config_sample.ini` for an example).
 
-- lastfm-artists_by_genre : Export artists name from one or several genres to csv files (2 backends available, beautifulsoup4 and pylast).
-- lastfm-artists_infos : Export data for one or several artists (Fields : Name, URL, Listeners, Playcount, Country, Tags, Top Tracks, Top Albums, Similar Artists). Slow (~10s/artist)
-- lastfm-complete_timeline : Export all the scrobbles of one or several users in csv files (Fields : Artist, Album, Title, Date, Timestamp).
-- lastfm-all_favorite_tracks : Export all favorite tracks of one or several users in csv files (Format : Artist - Track)
+- `lastfm-artists_by_genre` : Export artists name from one or several genres to csv files (2 backends available, beautifulsoup4 and pylast).
+- `lastfm-artists_infos` : Export data for one or several artists (Fields : Name, URL, Listeners, Playcount, Country, Tags, Top Tracks, Top Albums, Similar Artists). Slow (~10s/artist)
+- `lastfm-complete_timeline` : Export all the scrobbles of one or several users in csv files (Fields : Artist, Album, Title, Date, Timestamp).
+- `lastfm-all_favorite_tracks` : Export all favorite tracks of one or several users in csv files (Format : Artist - Track)
 
 ## Requirements
 
@@ -17,12 +17,6 @@ The scripts need a valid config file with your lastfm API keys (get them at last
 - pandas
 - requests
 - pylast
-
-## Installation of the virtualenv (recommended)
-
-```
-pipenv install
-```
 
 ## Usage
 

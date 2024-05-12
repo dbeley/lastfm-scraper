@@ -21,8 +21,7 @@ def get_artists(soup):
 def main():
     args = parse_args()
     if not args.artists:
-        logger.error("Use the -a flag to input a artist to scrap.")
-        exit()
+        raise Exception("Use the -a flag to input a artist to scrap.")
     artists = [x.strip() for x in args.artists.split(",")]
 
     Path("Exports").mkdir(parents=True, exist_ok=True)

@@ -29,11 +29,9 @@ def lastfmconnect():
 def main():
     args = parse_args()
     network = lastfmconnect()
-    if args.username:
-        users = [x.strip() for x in args.username.split(",")]
-    else:
-        logger.error("Use the -u/--username flag to set an username.")
-        exit()
+    if not args.username:
+        raise Exception("Use the -u/--username flag to set an username.")
+    users = [x.strip() for x in args.username.split(",")]
 
     Path("Exports").mkdir(parents=True, exist_ok=True)
 

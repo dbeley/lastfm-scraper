@@ -30,10 +30,9 @@ def lastfmconnect():
 def main():
     args = parse_args()
     if not args.genres:
-        logger.error(
+        raise Exception(
             "Use the -g flag to input one or several (separated by comma) genres to scrap."
         )
-        exit()
     genres = [x.strip() for x in args.genres.split(",")]
 
     network = lastfmconnect()
