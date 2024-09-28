@@ -5,6 +5,7 @@ import time
 import math
 import argparse
 from pathlib import Path
+import random
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from tqdm import tqdm
@@ -32,6 +33,18 @@ def lastfmconnect():
     return network
 
 
+# Custom color function to adjust brightness based on the word size
+def bright_color_func(
+    word, font_size, position, orientation, random_state=None, **kwargs
+):
+    # Generate a brighter color for larger words (higher font_size)
+    brightness = int(255 * (font_size / 200))  # Adjust this range as needed
+    r = random.randint(brightness, 255)  # Random but brighter
+    g = random.randint(brightness, 255)
+    b = random.randint(brightness, 255)
+    return f"rgb({r}, {g}, {b})"
+
+
 def main():
     args = parse_args()
     network = lastfmconnect()
@@ -49,10 +62,6 @@ def main():
         logger.info("Computing word cloud for %s.", user)
         user = network.get_user(user)
 
-        # number_of_pages = math.ceil(args.artists_count / 50)
-        # top_artists = []
-        # for page_number in range(1, number_of_pages):
-        #     top_artists.extend(user.get_top_artists(period=args.timeframe, limit=50, page=page_number))
         top_artists = user.get_top_artists(
             period=args.timeframe, limit=args.artists_count
         )
@@ -81,21 +90,25 @@ def main():
         # Create a word cloud with specified settings
         wordcloud = WordCloud(
             background_color="black",  # Set background color to black
-            colormap="spring",  # Use a vibrant colormap
+            colormap="Greys",  # Use a vibrant colormap
             width=2560,  # Width of the image
             height=1440,  # Height of the image
             # max_words=50,              # Limit to 50 words
             # contour_color='white',     # Contour color for detail
-            contour_width=1,  # Width of the contour
+            # contour_width=1,           # Width of the contour
             prefer_horizontal=1.0,  # Prefer horizontal words
         ).generate_from_frequencies(dict_frequencies)
 
         # Display the word cloud using matplotlib
         # plt.figure(figsize=(10, 5))
         plt.figure()
-        plt.imshow(wordcloud, interpolation="bilinear")
+        # plt.imshow(wordcloud, interpolation="bilinear")
+        plt.imshow(
+            wordcloud.recolor(color_func=bright_color_func, random_state=3),
+            interpolation="bilinear",
+        )
         plt.axis("off")
-        plt.tight_layout()
+        # plt.tight_layout()
         # plt.show()
         plt.savefig(
             f"Exports/{user}_{int(time.time())}_{args.timeframe}.png",
