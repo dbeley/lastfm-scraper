@@ -7,6 +7,7 @@ import argparse
 from pathlib import Path
 import random
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from wordcloud import WordCloud
 from tqdm import tqdm
 
@@ -31,6 +32,22 @@ def lastfmconnect():
         password_hash=api_password,
     )
     return network
+
+
+def custom_color_func(
+    word, font_size, position, orientation, random_state=None, **kwargs
+):
+    # Normalize the font size to get a value between 0 and 1
+    normalized_font_size = (
+        font_size / 250
+    )  # Adjust this based on the expected max font size
+    normalized_font_size = min(
+        max(normalized_font_size, 0), 1
+    )  # Ensure it's within [0, 1]
+
+    # Get the color from a matplotlib colormap
+    color = cm.Blues(1 - normalized_font_size)
+    return f"rgb({int(color[0] * 255)}, {int(color[1] * 255)}, {int(color[2] * 255)})"
 
 
 def main():
@@ -72,22 +89,26 @@ def main():
                         top_tag.weight
                     )
 
-        # Create a word cloud with specified settings
         wordcloud = WordCloud(
-            background_color="black",  # Set background color to black
-            colormap="Greys",  # Use a vibrant colormap
-            width=2560,  # Width of the image
-            height=1440,  # Height of the image
-            prefer_horizontal=1.0,  # Prefer horizontal words
+            background_color="black",
+            colormap="binary",
+            width=2560,
+            height=1440,
+            prefer_horizontal=1.0,
         ).generate_from_frequencies(dict_frequencies)
 
         plt.figure()
-        plt.imshow(wordcloud, interpolation="bilinear")
+        # plt.imshow(wordcloud, interpolation="bilinear")
+        plt.imshow(
+            wordcloud.recolor(color_func=custom_color_func, random_state=3),
+            interpolation="bilinear",
+        )
         plt.axis("off")
         plt.savefig(
             f"Exports/{user}_{int(time.time())}_{args.timeframe}.png",
             dpi=300,
             bbox_inches="tight",
+            pad_inches=0,
         )
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
