@@ -11,6 +11,7 @@ pkgs.mkShell {
     python3Packages.beautifulsoup4
     python3Packages.lxml
     python3Packages.tqdm
+    python3Packages.wordcloud
 
     pre-commit
   ];
