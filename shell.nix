@@ -12,6 +12,7 @@ pkgs.mkShell {
     python3Packages.lxml
     python3Packages.tqdm
     python3Packages.wordcloud
+    python3Packages.black
 
     pre-commit
   ];

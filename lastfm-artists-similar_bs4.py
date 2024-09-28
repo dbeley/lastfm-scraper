@@ -36,13 +36,9 @@ def main():
 
                 artists = artists + get_artists(soup)
                 logger.debug("Total artists number : %s", len(artists))
-                lien = soup.find("li", {"class": "pagination-next"}).find("a")[
-                    "href"
-                ]
+                lien = soup.find("li", {"class": "pagination-next"}).find("a")["href"]
                 logger.debug("Next page : %s/{lien}", url)
-                soup = BeautifulSoup(
-                    requests.get(f"{url}/{lien}").content, "lxml"
-                )
+                soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
             with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
                 for artist in artists:
                     f.write(f"{artist}\n")

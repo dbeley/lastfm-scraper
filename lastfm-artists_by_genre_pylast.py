@@ -42,8 +42,7 @@ def main():
     for genre in tqdm(genres, dynamic_ncols=True):
         try:
             artists = [
-                x.item.name
-                for x in network.get_tag(genre).get_top_artists(limit=1000)
+                x.item.name for x in network.get_tag(genre).get_top_artists(limit=1000)
             ]
 
             with open(f"Exports/{genre}_pylast.csv", "w") as f:
