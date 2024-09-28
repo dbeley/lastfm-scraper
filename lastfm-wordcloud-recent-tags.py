@@ -2,16 +2,18 @@ import pylast
 import configparser
 import logging
 import time
+import math
 import argparse
 from pathlib import Path
+import matplotlib.pyplot as plt
 from wordcloud import WordCloud
+from tqdm import tqdm
 
 logger = logging.getLogger()
+logging.getLogger("pylast").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 temps_debut = time.time()
 
-NUM_ARTISTS = 50
-NUM_TAGS = 10
-FORBIDDEN_TAGS = ["seen live", "lo-fi", "british", "alternative", "rock", "indie", "pop", "80s", "70s", "90s", "60s", "piano", "kicksastic", "ecm", "french", "manchester", "female vocalists", "canadian", "swedish", "trumpet", "the beatles", "japanese", "spiritual", "american", "acoustic", "psychedelic", "shibuya-key", "usa", "pennsylvania", "oldies", "japanese city pop", "philadelphia", "france", "instrumental", "j-indie", "new york", "uk", "00s", "10s", "20s"]
 
 def lastfmconnect():
     config = configparser.ConfigParser()
@@ -39,29 +41,67 @@ def main():
 
     Path("Exports").mkdir(parents=True, exist_ok=True)
 
+    # Load the forbidden tags list
+    forbidden_tags = [line.strip() for line in open("forbidden_tags.txt")]
+
     dict_frequencies = {}
     for user in users:
-        logger.info("Extracting favorite tracks for %s.", user)
+        logger.info("Computing word cloud for %s.", user)
         user = network.get_user(user)
 
-        top_artists = user.get_top_artists(period=args.timeframe)
-        for top_item in top_artists[0:NUM_ARTISTS]:
-            logger.info("Getting top tags for %s.", top_item.item.name)
+        # number_of_pages = math.ceil(args.artists_count / 50)
+        # top_artists = []
+        # for page_number in range(1, number_of_pages):
+        #     top_artists.extend(user.get_top_artists(period=args.timeframe, limit=50, page=page_number))
+        top_artists = user.get_top_artists(
+            period=args.timeframe, limit=args.artists_count
+        )
+        for top_item in tqdm(top_artists, dynamic_ncols=True):
             top_tags = top_item.item.get_top_tags()
-            top_tags = [top_tag for top_tag in top_tags if top_tag.item.name.lower() not in FORBIDDEN_TAGS]
-            # filter word I don't want
-            for top_tag in top_tags[0:NUM_TAGS]:
-                if top_tag.item.name in dict_frequencies:
-                    dict_frequencies[top_tag.item.name] += int(top_item.weight) * int(top_tag.weight)
+            top_tags = [
+                top_tag
+                for top_tag in top_tags
+                if top_tag.item.name.lower() not in forbidden_tags
+            ]
+            # filter tags I don't want
+            for top_tag in top_tags[0 : args.top_tags_count]:
+                top_tag_name = top_tag.item.name.lower()
+                if top_tag_name in dict_frequencies:
+                    dict_frequencies[top_tag_name] += int(top_item.weight) * int(
+                        top_tag.weight
+                    )
                 else:
-                    dict_frequencies[top_tag.item.name] = int(top_item.weight) * int(top_tag.weight)
+                    dict_frequencies[top_tag_name] = int(top_item.weight) * int(
+                        top_tag.weight
+                    )
 
-        wordcloud = WordCloud().generate_from_frequencies(dict_frequencies)
-        import matplotlib.pyplot as plt
-        plt.imshow(wordcloud, interpolation='bilinear')
+        # wordcloud = WordCloud().generate_from_frequencies(dict_frequencies)
+        # plt.imshow(wordcloud, interpolation='bilinear')
+
+        # Create a word cloud with specified settings
+        wordcloud = WordCloud(
+            background_color="black",  # Set background color to black
+            colormap="spring",  # Use a vibrant colormap
+            width=2560,  # Width of the image
+            height=1440,  # Height of the image
+            # max_words=50,              # Limit to 50 words
+            # contour_color='white',     # Contour color for detail
+            contour_width=1,  # Width of the contour
+            prefer_horizontal=1.0,  # Prefer horizontal words
+        ).generate_from_frequencies(dict_frequencies)
+
+        # Display the word cloud using matplotlib
+        # plt.figure(figsize=(10, 5))
+        plt.figure()
+        plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis("off")
-        plt.show()
-
+        plt.tight_layout()
+        # plt.show()
+        plt.savefig(
+            f"Exports/{user}_{int(time.time())}_{args.timeframe}.png",
+            dpi=300,
+            bbox_inches="tight",
+        )
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
@@ -92,6 +132,20 @@ def parse_args():
                               Default : 7day).",
         type=str,
         default="1month",
+    )
+    parser.add_argument(
+        "--artists_count",
+        "-a",
+        help="Number of artists to extract (default 10).",
+        type=int,
+        default=50,
+    )
+    parser.add_argument(
+        "--top_tags_count",
+        "-g",
+        help="Number of top tags to take into account by artist (default 4).",
+        type=int,
+        default=4,
     )
     args = parser.parse_args()
 
