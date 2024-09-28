@@ -77,7 +77,6 @@ def main():
                 for top_tag in top_tags
                 if top_tag.item.name.lower() not in forbidden_tags
             ]
-            # filter tags I don't want
             for top_tag in top_tags[0 : args.top_tags_count]:
                 top_tag_name = top_tag.item.name.lower()
                 if top_tag_name in dict_frequencies:
@@ -98,7 +97,6 @@ def main():
         ).generate_from_frequencies(dict_frequencies)
 
         plt.figure()
-        # plt.imshow(wordcloud, interpolation="bilinear")
         plt.imshow(
             wordcloud.recolor(color_func=custom_color_func, random_state=3),
             interpolation="bilinear",
