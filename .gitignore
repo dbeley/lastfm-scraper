@@ -1,5 +1,8 @@
+.gitignore
 Exports/
 config.ini
 tags
 .venv/
 .direnv
+test_1/
+test_2/
