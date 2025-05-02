@@ -1,3 +1,4 @@
+import csv
 import time
 import argparse
 import logging
@@ -13,8 +14,18 @@ temps_debut = time.time()
 
 def get_artists(soup):
     artists = []
-    for item in soup.findAll("h3", {"class": "similar-artists-item-name"}):
-        artists.append(item.find("a").text)
+    for item in soup.find_all("li", {"class": "similar-artists-item-wrap"}):
+        name = item.find("h3", {"class": "similar-artists-item-name"})
+        if name != None:
+            name = name.find("a").text
+            listens = item.find("p", {"class": "similar-artists-item-listeners"}).text
+            listens = listens.strip().split(" ")[0].replace(',','')
+            tags = ','.join([x.text for x in item.find_all("li", {"class": "tag"})])
+            #description = item.find("div", {"similar-artists-item-wiki-inner-2"}).text
+            artist = [name, listens, tags]
+            artists.append(artist)
+        else:
+            pass
     return artists
 
 
@@ -40,8 +51,9 @@ def main():
                 logger.debug("Next page : %s/{lien}", url)
                 soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
             with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
+                output = csv.writer(f)
                 for artist in artists:
-                    f.write(f"{artist}\n")
+                    output.writerow(artist)
         except Exception as e:
             logger.error("%s", e)
 
