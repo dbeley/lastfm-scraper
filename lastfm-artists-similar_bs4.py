@@ -31,9 +31,15 @@ def get_artists(soup):
 
 def main():
     args = parse_args()
-    if not args.artists:
-        raise Exception("Use the -a flag to input a artist to scrap.")
-    artists = [x.strip() for x in args.artists.split(",")]
+    if not args.artists and not args.input:
+        raise Exception("Use the -a flag or the -i flag to input artists to scrap.")
+    if args.artists:
+        artists = [x.strip() for x in args.artists.split(",")]
+    if args.input:
+        artists = []
+        for artist in csv.reader(args.input):
+            artists.append(artist[0])
+
 
     Path("Exports").mkdir(parents=True, exist_ok=True)
 
@@ -75,6 +81,12 @@ def parse_args():
         "--artists",
         type=str,
         help="artists to scrap (separated by comma).",
+    )
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=argparse.FileType('r'),
+        help="comma-separated file containing a list of artists in its first column. Typically a lastfm-scraper output file."
     )
     args = parser.parse_args()
 
