@@ -12,7 +12,7 @@ logger = logging.getLogger()
 temps_debut = time.time()
 
 
-def get_artists(soup):
+def get_similars(soup):
     artists = []
     for item in soup.find_all("li", {"class": "similar-artists-item-wrap"}):
         name = item.find("h3", {"class": "similar-artists-item-name"})
@@ -27,6 +27,24 @@ def get_artists(soup):
         else:
             pass
     return artists
+
+
+def scrape_artist(artist):
+    try:
+        url = f"https://www.last.fm/music/{artist}/+similar"
+        soup = BeautifulSoup(requests.get(url).content, "lxml")
+        similars = []
+        i = 0
+        while soup.find("li", {"class": "pagination-next"}) and i < 2:
+            similars = similars + get_similars(soup)
+            logger.debug("Total artists number : %s", len(similars))
+            lien = soup.find("li", {"class": "pagination-next"}).find("a")["href"]
+            logger.debug("Next page : %s/{lien}", url)
+            soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
+            i += 1
+            return similars
+    except Exception as e:
+        logger.error("%s", e)
 
 
 def main():
@@ -44,24 +62,22 @@ def main():
     Path("Exports").mkdir(parents=True, exist_ok=True)
 
     for artist in tqdm(artists, dynamic_ncols=True):
-        try:
-            url = f"https://www.last.fm/music/{artist}/+similar"
-            soup = BeautifulSoup(requests.get(url).content, "lxml")
-            artists = []
 
-            while soup.find("li", {"class": "pagination-next"}):
+        similars = scrape_artist(artist)
 
-                artists = artists + get_artists(soup)
-                logger.debug("Total artists number : %s", len(artists))
-                lien = soup.find("li", {"class": "pagination-next"}).find("a")["href"]
-                logger.debug("Next page : %s/{lien}", url)
-                soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
-            with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
-                output = csv.writer(f)
-                for artist in artists:
-                    output.writerow(artist)
-        except Exception as e:
-            logger.error("%s", e)
+        if args.deeper:
+            similars_of_similars = []
+            for similar in similars:
+                simisimi = scrape_artist(similar[0])
+                similars_of_similars.extend(scrape_artist(similar[0]))
+
+            similars = similars + similars_of_similars
+
+        with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
+            output = csv.writer(f)
+            for artist in similars:
+                output.writerow(artist)
+
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
@@ -87,6 +103,12 @@ def parse_args():
         "--input",
         type=argparse.FileType('r'),
         help="comma-separated file containing a list of artists in its first column. Typically a lastfm-scraper output file."
+    )
+    parser.add_argument(
+        "-d",
+        "--deeper",
+        action='store_true',
+        help="Deepen the crawl: get similar artists of the similar artists!"
     )
     args = parser.parse_args()
 
