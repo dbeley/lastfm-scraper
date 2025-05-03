@@ -62,13 +62,12 @@ def main():
     Path("Exports").mkdir(parents=True, exist_ok=True)
 
     for artist in tqdm(artists, dynamic_ncols=True):
-
         similars = scrape_artist(artist)
 
         if args.deeper:
+            print("Scraping similar artists of " + artist)
             similars_of_similars = []
-            for similar in similars:
-                simisimi = scrape_artist(similar[0])
+            for similar in tqdm(similars, dynamic_ncols=True):
                 similars_of_similars.extend(scrape_artist(similar[0]))
 
             similars = similars + similars_of_similars
