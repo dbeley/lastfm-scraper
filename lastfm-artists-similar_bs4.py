@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 
 logger = logging.getLogger()
-
 temps_debut = time.time()
 
 
@@ -34,15 +33,13 @@ def scrape_artist(artist):
         url = f"https://www.last.fm/music/{artist}/+similar"
         soup = BeautifulSoup(requests.get(url).content, "lxml")
         similars = []
-        i = 0
-        while soup.find("li", {"class": "pagination-next"}) and i < 2:
+        while soup.find("li", {"class": "pagination-next"}):
             similars = similars + get_similars(soup)
             logger.debug("Total artists number : %s", len(similars))
             lien = soup.find("li", {"class": "pagination-next"}).find("a")["href"]
             logger.debug("Next page : %s/{lien}", url)
             soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
-            i += 1
-            return similars
+        return similars
     except Exception as e:
         logger.error("%s", e)
 
@@ -57,7 +54,6 @@ def main():
         artists = []
         for artist in csv.reader(args.input):
             artists.append(artist[0])
-
 
     Path("Exports").mkdir(parents=True, exist_ok=True)
 
@@ -74,9 +70,9 @@ def main():
 
         with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
             output = csv.writer(f)
-            for artist in similars:
-                output.writerow(artist)
-
+            if similars != None and len(similars) > 0:
+                for artist in similars:
+                    output.writerow(artist)
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
@@ -113,7 +109,6 @@ def parse_args():
 
     logging.basicConfig(level=args.loglevel)
     return args
-
 
 if __name__ == "__main__":
     main()
