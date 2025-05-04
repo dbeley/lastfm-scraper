@@ -60,23 +60,26 @@ def main():
     Path("Exports").mkdir(parents=True, exist_ok=True)
 
     for artist in tqdm(artists, dynamic_ncols=True):
-        similars = scrape_artist(artist)
+        artist_output_file = Path("Exports/" + artist + "_similar-artists_bs4.csv")
+        if not artist_output_file.is_file():
 
-        if args.deeper:
-            similars_of_similars = []
-            for similar in tqdm(similars, dynamic_ncols=True):
-                if args.restricted:
-                    similars_of_similars.extend(scrape_artist(similar[0], True))
-                else:
-                    similars_of_similars.extend(scrape_artist(similar[0]))
+            similars = scrape_artist(artist)
 
-            similars = similars + similars_of_similars
+            if args.deeper:
+                similars_of_similars = []
+                for similar in tqdm(similars, dynamic_ncols=True):
+                    if args.restricted:
+                        similars_of_similars.extend(scrape_artist(similar[0], True))
+                    else:
+                        similars_of_similars.extend(scrape_artist(similar[0]))
 
-        with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
-            output = csv.writer(f)
-            if similars != None and len(similars) > 0:
-                for artist in similars:
-                    output.writerow(artist)
+                similars = similars + similars_of_similars
+
+            with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
+                output = csv.writer(f)
+                if similars != None and len(similars) > 0:
+                    for artist in similars:
+                        output.writerow(artist)
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
