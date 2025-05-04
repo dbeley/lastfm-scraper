@@ -28,17 +28,19 @@ def get_similars(soup):
     return artists
 
 
-def scrape_artist(artist):
+def scrape_artist(artist, restricted=False):
     try:
         url = f"https://www.last.fm/music/{artist}/+similar"
         soup = BeautifulSoup(requests.get(url).content, "lxml")
         similars = []
-        while soup.find("li", {"class": "pagination-next"}):
+        stop_it = False
+        while soup.find("li", {"class": "pagination-next"}) and stop_it is False:
             similars = similars + get_similars(soup)
             logger.debug("Total artists number : %s", len(similars))
             lien = soup.find("li", {"class": "pagination-next"}).find("a")["href"]
             logger.debug("Next page : %s/{lien}", url)
             soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
+            if restricted: stop_it = True
         return similars
     except Exception as e:
         logger.error("%s", e)
@@ -61,10 +63,12 @@ def main():
         similars = scrape_artist(artist)
 
         if args.deeper:
-            print("Scraping similar artists of " + artist)
             similars_of_similars = []
             for similar in tqdm(similars, dynamic_ncols=True):
-                similars_of_similars.extend(scrape_artist(similar[0]))
+                if args.restricted:
+                    similars_of_similars.extend(scrape_artist(similar[0], True))
+                else:
+                    similars_of_similars.extend(scrape_artist(similar[0]))
 
             similars = similars + similars_of_similars
 
@@ -104,6 +108,12 @@ def parse_args():
         "--deeper",
         action='store_true',
         help="Deepen the crawl: get similar artists of the similar artists!"
+    )
+    parser.add_argument(
+        "-r",
+        "--restricted",
+        action='store_true',
+        help="Will scrape only the first page of similar artists of the similar artists"
     )
     args = parser.parse_args()
 
