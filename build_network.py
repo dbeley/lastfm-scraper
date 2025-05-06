@@ -23,9 +23,12 @@ for file in os.listdir(folder):
 
 # add nodes and edges to the networkx graph object
 for node in nodes:
-    network.add_node(node, size=nodes[node][0], genres=nodes[node][1])
+    if nodes[node][0] != '' and nodes[node][1] != '':
+        network.add_node(node, size=nodes[node][0], genre_1=nodes[node][1][0])
+    else:
+        network.add_node(node)
 for edge in edges:
-    network.add_edge(edge, weight=edges[edge])
+    network.add_edge(edge[0], edge[1], weight=int(edges[edge]))
 
 # print basic informations and write graph to .gexf file
 print("The output network has :")
