@@ -67,6 +67,7 @@ def main():
 
             if args.deeper:
                 similars_of_similars = []
+                print("Scraping similar artists of " + artist)
                 for similar in tqdm(similars, dynamic_ncols=True):
                     if args.restricted:
                         similars_of_similars.extend(scrape_artist(similar[0], True))
