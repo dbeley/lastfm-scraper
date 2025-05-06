@@ -17,9 +17,11 @@ for file in os.listdir(folder):
     nodes[name] = ("", "")
     similars = csv.reader(open(folder + file, 'r'))
     for similar in similars:
+        listens = int(similar[1])
         genres = similar[2].split(",")
-        nodes[similar[0]] = (similar[1], genres)
-        edges[(name, similar[0])] += 1
+        if listens < 300000 and ("punk" in genres or "punk rock" in genres):
+            nodes[similar[0]] = (listens, genres)
+            edges[(name, similar[0])] += 1
 
 # add nodes and edges to the networkx graph object
 for node in nodes:
