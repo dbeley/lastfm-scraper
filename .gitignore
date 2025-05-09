@@ -6,4 +6,5 @@ tags
 .direnv
 test_1/
 test_2/
+networks/
 network.gexf

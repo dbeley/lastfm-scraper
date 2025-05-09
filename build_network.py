@@ -1,10 +1,12 @@
 import os
 import csv
+import time
 import networkx as nx
+from pathlib import Path
 from collections import defaultdict
 
 # default folder for similar artists data
-folder = "Exports/"
+folder = "Exports_sample/"
 
 # create graph object and nodes/edges lists
 network = nx.Graph()
@@ -36,4 +38,8 @@ for edge in edges:
 print("The output network has :")
 print("\t" + str(network.number_of_nodes()) + " nodes")
 print("\t" + str(network.number_of_edges()) + " edges")
-nx.write_gexf(network, "network.gexf")
+
+# outputs gexf file to a subdirectory
+Path("Networks").mkdir(parents=True, exist_ok=True)
+timestr = time.strftime("%Y%m%d-%H%M%S")
+nx.write_gexf(network, "Networks/" + timestr + "_network.gexf")
