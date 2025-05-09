@@ -1,9 +1,7 @@
 .gitignore
 Exports/
-Exports_sample/
 config.ini
 tags
 .venv/
 .direnv
-networks/
-network.gexf
+Networks/
