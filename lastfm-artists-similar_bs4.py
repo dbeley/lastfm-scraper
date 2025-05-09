@@ -10,7 +10,7 @@ from pathlib import Path
 logger = logging.getLogger()
 temps_debut = time.time()
 
-
+# scrape infos from a page of similar artists
 def get_similars(soup):
     artists = []
     for item in soup.find_all("li", {"class": "similar-artists-item-wrap"}):
@@ -27,7 +27,7 @@ def get_similars(soup):
             pass
     return artists
 
-
+# scrape all (fixed 239) similar artists for a given artist name
 def scrape_artist(artist, restricted=False):
     try:
         url = f"https://www.last.fm/music/{artist}/+similar"
@@ -45,7 +45,7 @@ def scrape_artist(artist, restricted=False):
     except Exception as e:
         logger.error("%s", e)
 
-
+# main handles output dir creation and options
 def main():
     args = parse_args()
     if not args.artists and not args.input:
@@ -84,7 +84,7 @@ def main():
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
-
+# cli argument parsing
 def parse_args():
     parser = argparse.ArgumentParser(description="artist lastfm scraper.")
     parser.add_argument(
