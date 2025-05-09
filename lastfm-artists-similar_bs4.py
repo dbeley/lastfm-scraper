@@ -28,19 +28,20 @@ def get_similars(soup):
     return artists
 
 # scrape all (fixed 239) similar artists for a given artist name
-def scrape_artist(artist, restricted=False):
+def scrape_artist(artist, restricted):
     try:
         url = f"https://www.last.fm/music/{artist}/+similar"
         soup = BeautifulSoup(requests.get(url).content, "lxml")
         similars = []
-        stop_it = False
-        while soup.find("li", {"class": "pagination-next"}) and stop_it is False:
+        if restricted:
             similars = similars + get_similars(soup)
-            logger.debug("Total artists number : %s", len(similars))
-            lien = soup.find("li", {"class": "pagination-next"}).find("a")["href"]
-            logger.debug("Next page : %s/{lien}", url)
-            soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
-            if restricted: stop_it = True
+        else:
+            while soup.find("li", {"class": "pagination-next"}):
+                similars = similars + get_similars(soup)
+                logger.debug("Total artists number : %s", len(similars))
+                lien = soup.find("li", {"class": "pagination-next"}).find("a")["href"]
+                logger.debug("Next page : %s/{lien}", url)
+                soup = BeautifulSoup(requests.get(f"{url}/{lien}").content, "lxml")
         return similars
     except Exception as e:
         logger.error("%s", e)
@@ -63,7 +64,10 @@ def main():
         artist_output_file = Path("Exports/" + artist + "_similar-artists_bs4.csv")
         if not artist_output_file.is_file():
 
-            similars = scrape_artist(artist)
+            if args.restricted:
+                similars = scrape_artist(artist, True)
+            else:
+                similars = scrape_artist(artist, False)
 
             if args.deeper:
                 similars_of_similars = []
@@ -72,7 +76,7 @@ def main():
                     if args.restricted:
                         similars_of_similars.extend(scrape_artist(similar[0], True))
                     else:
-                        similars_of_similars.extend(scrape_artist(similar[0]))
+                        similars_of_similars.extend(scrape_artist(similar[0], False))
 
                 similars = similars + similars_of_similars
 
