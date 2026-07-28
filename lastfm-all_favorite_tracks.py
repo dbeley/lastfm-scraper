@@ -1,9 +1,10 @@
-import pylast
+import argparse
 import configparser
 import logging
 import time
-import argparse
 from pathlib import Path
+
+import pylast
 
 logger = logging.getLogger()
 temps_debut = time.time()

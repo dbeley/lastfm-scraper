@@ -1,14 +1,14 @@
-import pylast
+import argparse
 import configparser
 import logging
 import time
-import argparse
-import pandas as pd
-import requests
-import time
-from tqdm import tqdm
 from pathlib import Path
+
+import pandas as pd
+import pylast
+import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 logger = logging.getLogger()
 temps_debut = time.time()
@@ -118,7 +118,7 @@ def main():
 
     # Export csv containing data for all the artists.
     pd.DataFrame.from_records(list_dict).to_csv(
-        f"Exports/complete_artists_infos.csv", sep="\t", index=False
+        "Exports/complete_artists_infos.csv", sep="\t", index=False
     )
 
     logger.info("Runtime : %.2f seconds" % (time.time() - temps_debut))

@@ -1,11 +1,12 @@
-import csv
-import time
 import argparse
+import csv
 import logging
-import requests
-from tqdm import tqdm
-from bs4 import BeautifulSoup
+import time
 from pathlib import Path
+
+import requests
+from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 logger = logging.getLogger()
 temps_debut = time.time()
@@ -15,7 +16,7 @@ def get_similars(soup):
     artists = []
     for item in soup.find_all("li", {"class": "similar-artists-item-wrap"}):
         name = item.find("h3", {"class": "similar-artists-item-name"})
-        if name != None:
+        if name is not None:
             name = name.find("a").text
             listens = item.find("p", {"class": "similar-artists-item-listeners"}).text
             listens = listens.strip().split(" ")[0].replace(',','')
@@ -82,7 +83,7 @@ def main():
 
             with open(f"Exports/{artist}_similar-artists_bs4.csv", "w") as f:
                 output = csv.writer(f)
-                if similars != None and len(similars) > 0:
+                if similars is not None and len(similars) > 0:
                     for artist in similars:
                         output.writerow(artist)
 
@@ -109,7 +110,8 @@ def parse_args():
         "-i",
         "--input",
         type=argparse.FileType('r'),
-        help="comma-separated file containing a list of artists in its first column. Typically a lastfm-scraper output file."
+        help="comma-separated file containing a list of artists in its first column. "
+              "Typically a lastfm-scraper output file."
     )
     parser.add_argument(
         "-d",

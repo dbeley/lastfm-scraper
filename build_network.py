@@ -1,9 +1,10 @@
-import os
 import csv
+import os
 import time
-import networkx as nx
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
+
+import networkx as nx
 
 # default folder for similar artists data
 folder = "Exports_sample/"
@@ -17,7 +18,7 @@ edges = defaultdict(int)
 for file in os.listdir(folder):
     name = file.split("_")[0]
     nodes[name] = ("", "")
-    similars = csv.reader(open(folder + file, 'r'))
+    similars = csv.reader(open(folder + file))
     for similar in similars:
         listens = int(similar[1])
         genres = similar[2].split(",")
