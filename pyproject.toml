@@ -1,0 +1,12 @@
+[project]
+name = "lastfm-scraper"
+version = "0.1.0"
+description = "Scripts to extract data from Last.fm"
+requires-python = ">=3.9"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]

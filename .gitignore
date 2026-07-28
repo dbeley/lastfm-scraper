@@ -1,7 +1,10 @@
-.gitignore
 Exports/
 config.ini
 tags
 .venv/
 .direnv
 Networks/
+result
+result-*
+*.egg-info/
+__pycache__/
