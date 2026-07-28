@@ -1,10 +1,11 @@
-import time
 import argparse
 import logging
-import requests
-from tqdm import tqdm
-from bs4 import BeautifulSoup
+import time
 from pathlib import Path
+
+import requests
+from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 logger = logging.getLogger()
 

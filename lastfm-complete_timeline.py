@@ -1,10 +1,11 @@
-import pylast
+import argparse
 import configparser
 import logging
 import time
-import argparse
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+import pylast
 
 logger = logging.getLogger()
 temps_debut = time.time()
